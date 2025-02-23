@@ -1,0 +1,88 @@
+<nav class="w-full bg-white shadow-md sticky top-0 z-50">
+  <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+    <!-- Logo -->
+    <div class="flex items-center space-x-2">
+      <i class="fa-solid fa-book fa-lg text-primary"></i>
+      <h2 class="text-lg font-bold">Ebook Collection</h2>
+    </div>
+
+    <!-- Menu for Larger Screens -->
+    <ul id="navbar-menu" class="hidden sm:flex space-x-4">
+      <!-- Ayobaca Menu -->
+      <li>
+        <a href="ebooks.html" class="flex items-center text-gray-700 hover:text-primary transition duration-300 font-medium">
+          <i class="fa-solid fa-book-open fa-lg mr-2"></i>
+          Ayobaca
+        </a>
+      </li>
+
+      <!-- Settings Menu -->
+      <li>
+        <a href="settings.html" class="flex items-center text-gray-700 hover:text-primary transition duration-300 font-medium">
+          <i class="fa-solid fa-gear fa-lg mr-2"></i>
+          Settings
+        </a>
+      </li>
+
+      <!-- Right Menu for Larger Screens -->
+      <div id="auth-buttons" class="flex space-x-4">
+        <a href="login.html" class="btn btn-sm btn-outline flex items-center">
+          <i class="fa-solid fa-right-to-bracket fa-lg mr-2"></i>
+          Login
+        </a>
+        <a href="signup.html" class="btn btn-sm btn-primary flex items-center">
+          <i class="fa-solid fa-user-plus fa-lg mr-2"></i>
+          Sign Up
+        </a>
+      </div>
+
+      <!-- Logged In Status -->
+      <div id="logged-in-status" class="hidden items-center space-x-2">
+        <img src="https://via.placeholder.com/40" alt="User Avatar" class="w-10 h-10 rounded-full">
+        <span id="user-info" class="font-medium">Logged In as User</span>
+      </div>
+    </ul>
+
+    <!-- Hamburger Menu for Smaller Screens -->
+    <div class="sm:hidden relative">
+      <!-- Tombol Hamburger -->
+      <label for="menu-toggle" class="cursor-pointer text-gray-700 hover:text-primary focus:outline-none">
+        <i class="fa-solid fa-bars fa-lg"></i>
+      </label>
+      <input type="checkbox" id="menu-toggle" class="hidden" />
+
+      <!-- Mobile Menu -->
+      <div id="mobile-menu" class="hidden absolute right-0 mt-2 w-48 bg-white shadow-md rounded-lg py-2">
+        <a href="ebooks.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-300 flex items-center">
+          <i class="fa-solid fa-book-open fa-lg mr-2"></i>
+          Ayobaca
+        </a>
+        <a href="settings.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-300 flex items-center">
+          <i class="fa-solid fa-gear fa-lg mr-2"></i>
+          Settings
+        </a>
+        <a href="login.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-300 flex items-center">
+          <i class="fa-solid fa-right-to-bracket fa-lg mr-2"></i>
+          Login
+        </a>
+        <a href="signup.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-300 flex items-center">
+          <i class="fa-solid fa-user-plus fa-lg mr-2"></i>
+          Sign Up
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- CSS untuk Toggle Menu -->
+<style>
+  /* Sembunyikan mobile menu secara default */
+  #mobile-menu {
+    display: none;
+  }
+
+  /* Tampilkan mobile menu saat checkbox di-check */
+  #menu-toggle:checked ~ #mobile-menu {
+    display: block;
+  }
+</style>

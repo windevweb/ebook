@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Books - Ebook Collection</title>
+  <!-- Google Fonts (Poppins) -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- DaisyUI CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@3.5.1/dist/full.css" rel="stylesheet" type="text/css" />
+  <!-- Font Awesome CDN -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <!-- SweetAlert2 CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="min-h-screen bg-gray-100 text-black font-sans" style="font-family: 'Poppins', sans-serif;">
+
+  <!-- Navbar Placeholder -->
+  <div id="navbar-placeholder">
+    <p class="text-center text-red-500">Navbar failed to load. Please check the file path.</p>
+  </div>
+
+  <!-- Sidebar and Main Content -->
+  <div class="flex flex-1 overflow-hidden">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white shadow-md sticky top-0 h-screen overflow-y-auto">
+      <div class="p-6">
+        <h2 class="text-xl font-bold text-center text-primary mb-6">Admin Panel</h2>
+        <ul class="space-y-4">
+          <li>
+            <a href="dashboard.html" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition duration-300">
+              <i class="fa-solid fa-tachometer-alt fa-lg mr-3 text-primary"></i>
+              Dashboard
+            </a>
+          </li>
+          <li>
+            <a href="manage-books.html" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition duration-300 active">
+              <i class="fa-solid fa-book fa-lg mr-3 text-primary"></i>
+              Manage Books
+            </a>
+          </li>
+          <li>
+            <a href="#" class="flex items-center px-4 py-2 text-red-600 hover:bg-red-100 rounded-lg transition duration-300">
+              <i class="fa-solid fa-sign-out-alt fa-lg mr-3 text-red-600"></i>
+              Logout
+            </a>
+          </li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6 overflow-y-auto">
+      <h1 class="text-3xl font-bold text-gray-800 mb-6">Manage Books</h1>
+
+      <!-- Add/Edit Book Form -->
+      <div class="bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+          <i class="fa-solid fa-plus fa-lg mr-2 text-primary"></i>
+          Add/Edit Book
+        </h2>
+        <form id="book-form" class="space-y-4">
+          <input type="hidden" id="book-id">
+          <div>
+            <label class="label">
+              <span class="label-text flex items-center">
+                <i class="fa-solid fa-heading fa-lg mr-2 text-primary"></i>
+                Title
+              </span>
+            </label>
+            <input type="text" id="book-title" placeholder="Enter book title" class="input input-bordered w-full" required>
+          </div>
+          <div>
+            <label class="label">
+              <span class="label-text flex items-center">
+                <i class="fa-solid fa-user fa-lg mr-2 text-primary"></i>
+                Author
+              </span>
+            </label>
+            <input type="text" id="book-author" placeholder="Enter author name" class="input input-bordered w-full" required>
+          </div>
+          <div>
+            <label class="label">
+              <span class="label-text flex items-center">
+                <i class="fa-solid fa-image fa-lg mr-2 text-primary"></i>
+                Cover URL
+              </span>
+            </label>
+            <input type="url" id="book-cover-url" placeholder="Enter cover image URL" class="input input-bordered w-full" required>
+          </div>
+          <div>
+            <label class="label">
+              <span class="label-text flex items-center">
+                <i class="fa-solid fa-link fa-lg mr-2 text-primary"></i>
+                Read URL
+              </span>
+            </label>
+            <input type="url" id="book-read-url" placeholder="Enter read URL" class="input input-bordered w-full" required>
+          </div>
+          <div>
+            <button type="submit" class="btn btn-primary w-full">
+              <i class="fa-solid fa-save mr-2"></i>
+              Save Book
+            </button>
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <div id="footer-placeholder">
+    <p class="text-center text-red-500">Footer failed to load. Please check the file path.</p>
+  </div>
+
+  <!-- Supabase JS Library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+  <script>
+    // Load navbar dynamically
+    fetch('navbar.html')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.text();
+      })
+      .then(data => {
+        document.getElementById('navbar-placeholder').innerHTML = data;
+      })
+      .catch(error => {
+        console.error("Error loading navbar:", error);
+        document.getElementById('navbar-placeholder').innerHTML =
+          `<p class="text-center text-red-500">Navbar failed to load. Please check the file path.</p>`;
+      });
+
+    // Load footer dynamically
+    fetch('footer.html')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.text();
+      })
+      .then(data => {
+        document.getElementById('footer-placeholder').innerHTML = data;
+      })
+      .catch(error => {
+        console.error("Error loading footer:", error);
+        document.getElementById('footer-placeholder').innerHTML =
+          `<p class="text-center text-red-500">Footer failed to load. Please check the file path.</p>`;
+      });
+
+    // Initialize Supabase Client After Script Loads
+    const SUPABASE_URL = "https://eyzvqdknrkkjznqvmxgb.supabase.co";
+    const SUPABASE_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5enZxZGtucmtranpucXZteGdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg0OTc1NzksImV4cCI6MjA1NDA3MzU3OX0.v-3bKrF431br9SKSXPzUOHU-f4CW_4SAgtSic502sbs";
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const { createClient } = window.supabase;
+      if (!createClient) {
+        console.error("Supabase library failed to load.");
+        return;
+      }
+
+      const supabaseClient = createClient(SUPABASE_URL, SUPABASE_API_KEY);
+
+      // DOM Elements
+      const bookForm = document.getElementById('book-form');
+      const bookIdInput = document.getElementById('book-id');
+      const bookTitleInput = document.getElementById('book-title');
+      const bookAuthorInput = document.getElementById('book-author');
+      const bookCoverUrlInput = document.getElementById('book-cover-url');
+      const bookReadUrlInput = document.getElementById('book-read-url');
+
+      // Function to get query parameters from the URL
+      function getQueryParams() {
+        const params = {};
+        window.location.search
+          .substring(1)
+          .split('&')
+          .forEach(pair => {
+            const [key, value] = pair.split('=');
+            params[key] = decodeURIComponent(value);
+          });
+        return params;
+      }
+
+      // Load book data for editing
+      async function loadBookForEditing(bookId) {
+        const { data, error } = await supabaseClient
+          .from('ebooks')
+          .select('*')
+          .eq('id', bookId)
+          .single();
+
+        if (error) {
+          console.error("Error fetching book:", error);
+          return;
+        }
+
+        bookIdInput.value = data.id;
+        bookTitleInput.value = data.title;
+        bookAuthorInput.value = data.author;
+        bookCoverUrlInput.value = data.cover_url;
+        bookReadUrlInput.value = data.read_url;
+      }
+
+      // Check if an ID is provided in the URL
+      const queryParams = getQueryParams();
+      if (queryParams.id) {
+        loadBookForEditing(queryParams.id);
+      }
+
+      // Save Book (Create or Update)
+      bookForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = bookIdInput.value;
+        const title = bookTitleInput.value;
+        const author = bookAuthorInput.value;
+        const coverUrl = bookCoverUrlInput.value;
+        const readUrl = bookReadUrlInput.value;
+
+        let successMessage = 'Book added successfully!';
+        let errorMessage = 'Failed to add the book!';
+        let operation;
+
+        if (id) {
+          // Update existing book
+          operation = supabaseClient
+            .from('ebooks')
+            .update({ title, author, cover_url: coverUrl, read_url: readUrl })
+            .eq('id', id);
+          successMessage = 'Book updated successfully!';
+          errorMessage = 'Failed to update the book!';
+        } else {
+          // Insert new book
+          operation = supabaseClient
+            .from('ebooks')
+            .insert([{ title, author, cover_url: coverUrl, read_url: readUrl }]);
+        }
+
+        const { error } = await operation;
+
+        if (error) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: errorMessage,
+          });
+          console.error(errorMessage, error);
+        } else {
+          Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: successMessage,
+          });
+          resetForm();
+        }
+      });
+
+      // Reset Form Fields
+      function resetForm() {
+        bookIdInput.value = '';
+        bookTitleInput.value = '';
+        bookAuthorInput.value = '';
+        bookCoverUrlInput.value = '';
+        bookReadUrlInput.value = '';
+      }
+    });
+  </script>
+</body>
+</html>

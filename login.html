@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Log In - Ebook Collection</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- DaisyUI CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@3.5.1/dist/full.css" rel="stylesheet" type="text/css" />
+  <!-- SweetAlert2 CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="min-h-screen bg-gray-100 text-black font-sans">
+  <main class="flex items-center justify-center min-h-screen">
+    <div class="card w-full max-w-md bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h2 class="card-title text-center text-2xl font-bold">Log In</h2>
+        <form id="login-form" class="space-y-4">
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Email</span>
+            </label>
+            <input type="email" id="email" placeholder="Enter your email" class="input input-bordered w-full" required />
+          </div>
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Password</span>
+            </label>
+            <input type="password" id="password" placeholder="Enter your password" class="input input-bordered w-full" required />
+          </div>
+          <button type="submit" class="btn btn-primary w-full">Log In</button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <!-- Supabase JS Library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+  <script>
+    const SUPABASE_URL = "https://eyzvqdknrkkjznqvmxgb.supabase.co";
+    const SUPABASE_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5enZxZGtucmtranpucXZteGdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg0OTc1NzksImV4cCI6MjA1NDA3MzU3OX0.v-3bKrF431br9SKSXPzUOHU-f4CW_4SAgtSic502sbs";
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const { createClient } = window.supabase;
+      if (!createClient) {
+        console.error("Supabase library failed to load.");
+        return;
+      }
+
+      const supabaseClient = createClient(SUPABASE_URL, SUPABASE_API_KEY);
+
+      // Handle Login Form Submission
+      const loginForm = document.getElementById('login-form');
+      loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        // Log in user in Supabase Auth
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (error) {
+          // Show error alert using SweetAlert2
+          Swal.fire({
+            icon: 'error',
+            title: 'Login Failed',
+            text: 'Invalid email or password. Please try again.',
+          });
+          return;
+        }
+
+        const userRole = data.user.user_metadata.role;
+
+        // Show success alert using SweetAlert2
+        Swal.fire({
+          icon: 'success',
+          title: 'Login Successful',
+          text: `Welcome back as ${userRole}!`,
+        }).then(() => {
+          // Redirect based on role
+          if (userRole === 'admin') {
+            window.location.href = 'src/manage-books.html';
+          } else {
+            window.location.href = 'src/index.html';
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

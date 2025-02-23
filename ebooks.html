@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ebook Collection - Explore</title>
+  <!-- Google Fonts (Poppins) -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- DaisyUI CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@3.5.1/dist/full.css" rel="stylesheet" type="text/css" />
+  <!-- Font Awesome CDN -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+</head>
+<body class="min-h-screen bg-gray-100 text-black font-sans" style="font-family: 'Poppins', sans-serif;">
+
+  <!-- Navbar Placeholder -->
+  <div id="navbar-placeholder">
+    <p class="text-center text-red-500">Navbar failed to load. Please check the file path.</p>
+  </div>
+
+  <!-- Main Content -->
+  <main class="flex-1 p-6 overflow-y-auto">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
+      <i class="fa-solid fa-book-open fa-lg mr-2 text-primary"></i>
+      Ebook Collection
+    </h1>
+
+    <p class="text-gray-700 mb-6">
+      Explore a wide range of ebooks with a modern and clean design.
+    </p>
+
+    <!-- Back to Home Button -->
+    <a href="index.html" class="btn btn-sm btn-primary mb-6">
+      <i class="fa-solid fa-home mr-2"></i>
+      Back to Home
+    </a>
+
+    <!-- Search Bar -->
+    <div class="mb-6">
+      <input type="text" id="search-input" placeholder="Search by title..." class="input input-bordered w-full" />
+    </div>
+
+    <!-- Card Grid for Ebooks -->
+    <div id="ebooks-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Cards will be dynamically populated here -->
+    </div>
+
+    <!-- Pagination -->
+    <div class="flex justify-between items-center mt-6">
+      <div class="btn-group">
+        <button id="prev-page" class="btn btn-sm">
+          <i class="fa-solid fa-arrow-left mr-2"></i> Previous
+        </button>
+        <button id="next-page" class="btn btn-sm">
+          Next <i class="fa-solid fa-arrow-right ml-2"></i>
+        </button>
+      </div>
+      <span id="pagination-info" class="text-sm text-gray-600"></span>
+    </div>
+
+    <!-- Description -->
+    <div class="mt-6 bg-white p-4 rounded-lg shadow-md">
+      <h2 class="text-lg font-bold text-gray-800 flex items-center">
+        <i class="fa-solid fa-info-circle fa-lg mr-2 text-primary"></i>
+        About This Collection
+      </h2>
+      <p class="text-gray-700 mt-2">
+        This is a collection of ebooks available for reading. Use the pagination controls to navigate through the list.
+      </p>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <div id="footer-placeholder">
+    <p class="text-center text-red-500">Footer failed to load. Please check the file path.</p>
+  </div>
+
+  <!-- Supabase JS Library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+  <script>
+    // Load navbar dynamically
+    fetch('navbar.html')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.text();
+      })
+      .then(data => {
+        document.getElementById('navbar-placeholder').innerHTML = data;
+      })
+      .catch(error => {
+        console.error("Error loading navbar:", error);
+        document.getElementById('navbar-placeholder').innerHTML =
+          `<p class="text-center text-red-500">Navbar failed to load. Please check the file path.</p>`;
+      });
+
+    // Load footer dynamically
+    fetch('footer.html')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.text();
+      })
+      .then(data => {
+        document.getElementById('footer-placeholder').innerHTML = data;
+      })
+      .catch(error => {
+        console.error("Error loading footer:", error);
+        document.getElementById('footer-placeholder').innerHTML =
+          `<p class="text-center text-red-500">Footer failed to load. Please check the file path.</p>`;
+      });
+
+    // Initialize Supabase Client After Script Loads
+    const SUPABASE_URL = "https://eyzvqdknrkkjznqvmxgb.supabase.co";
+    const SUPABASE_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5enZxZGtucmtranpucXZteGdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg0OTc1NzksImV4cCI6MjA1NDA3MzU3OX0.v-3bKrF431br9SKSXPzUOHU-f4CW_4SAgtSic502sbs";
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const { createClient } = window.supabase;
+      if (!createClient) {
+        console.error("Supabase library failed to load.");
+        return;
+      }
+
+      const supabaseClient = createClient(SUPABASE_URL, SUPABASE_API_KEY);
+
+      // DOM Elements
+      const ebooksGrid = document.getElementById('ebooks-grid');
+      const searchInput = document.getElementById('search-input');
+      const prevPageBtn = document.getElementById('prev-page');
+      const nextPageBtn = document.getElementById('next-page');
+      const paginationInfo = document.getElementById('pagination-info');
+
+      let currentPage = 1;
+      const pageSize = 6; // Number of books per page
+
+      // Helper Function: Check if Book is New (within 3 days)
+      function isNewBook(createdAt) {
+        const threeDaysAgo = new Date();
+        threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+        const bookDate = new Date(createdAt);
+        return bookDate > threeDaysAgo;
+      }
+
+      // Fetch and Render Books
+      async function fetchBooks(page, query = '') {
+        const fromIndex = (page - 1) * pageSize;
+        const toIndex = page * pageSize - 1;
+
+        let queryBuilder = supabaseClient
+          .from('ebooks')
+          .select('*', { count: 'exact' })
+          .range(fromIndex, toIndex);
+
+        if (query) {
+          queryBuilder = queryBuilder.ilike('title', `%${query}%`);
+        }
+
+        const { data, error, count } = await queryBuilder;
+
+        if (error) {
+          console.error("Error fetching books:", error);
+          return;
+        }
+
+        ebooksGrid.innerHTML = ''; // Clear existing cards
+        data.forEach(book => {
+          const isNew = isNewBook(book.created_at); // Check if book is new
+          const badge = isNew
+            ? `<div class="absolute top-2 left-2 px-3 py-1 text-xs font-bold text-white rounded-md z-10" style="background: linear-gradient(90deg, #FF70A6, #FF9770);">New</div>`
+            : '';
+
+          // Default cover image if no cover_url is provided
+          const coverUrl = book.cover_url || 'https://via.placeholder.com/200x300?text=No+Cover';
+
+          const card = `
+            <div class="card card-compact bg-base-100 shadow-xl relative transition duration-300 hover:shadow-2xl hover:-translate-y-2">
+              ${badge}
+              <figure class="relative">
+                <img src="${coverUrl}" alt="${book.title}" class="w-full h-48 object-cover rounded-t-lg">
+              </figure>
+              <div class="card-body">
+                <h2 class="card-title text-base line-clamp-2">${book.title}</h2>
+                <p class="text-sm text-gray-600">${book.author}</p>
+                <div class="card-actions justify-start">
+                  <a href="ebook-detail.html?id=${book.id}" class="btn btn-sm btn-primary">
+                    <i class="fa-solid fa-book-open mr-2"></i>
+                    Read
+                  </a>
+                </div>
+              </div>
+            </div>
+          `;
+          ebooksGrid.insertAdjacentHTML('beforeend', card); // Append new cards
+        });
+
+        updatePaginationInfo(page, count);
+      }
+
+      // Update Pagination Info
+      function updatePaginationInfo(page, totalBooks) {
+        const totalPages = Math.ceil(totalBooks / pageSize);
+        paginationInfo.textContent = `Page ${page} of ${totalBooks > 0 ? totalPages : 1} (${totalBooks} books)`;
+      }
+
+      // Handle Pagination Buttons
+      prevPageBtn.addEventListener('click', () => {
+        if (currentPage > 1) {
+          currentPage--;
+          fetchBooks(currentPage, searchInput.value.trim());
+        }
+      });
+
+      nextPageBtn.addEventListener('click', () => {
+        currentPage++;
+        fetchBooks(currentPage, searchInput.value.trim());
+      });
+
+      // Handle Search Input
+      searchInput.addEventListener('input', () => {
+        currentPage = 1; // Reset to first page when searching
+        fetchBooks(currentPage, searchInput.value.trim());
+      });
+
+      // Initial Fetch
+      fetchBooks(currentPage);
+    });
+  </script>
+</body>
+</html>

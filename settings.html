@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings - Ebook Collection</title>
+  <!-- Google Fonts (Poppins) -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- DaisyUI CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@3.5.1/dist/full.css" rel="stylesheet" type="text/css" />
+  <!-- Font Awesome CDN -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+</head>
+<body class="min-h-screen bg-gray-100 text-black font-sans" style="font-family: 'Poppins', sans-serif;" id="body">
+  <!-- Navbar Placeholder -->
+  <div id="navbar-placeholder"></div>
+  <!-- Main Content -->
+  <main class="container mx-auto px-6 py-8">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">Settings</h1>
+    <!-- Settings Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <!-- About Section -->
+      <div class="card card-compact bg-white shadow-md rounded-lg p-6">
+        <figure>
+          <i class="fa-solid fa-circle-info fa-3x text-primary mx-auto"></i>
+        </figure>
+        <div class="card-body text-center">
+          <h2 class="card-title text-lg font-semibold">About</h2>
+          <p class="text-sm text-gray-600">
+            Ebook Collection is a platform designed to provide access to a wide range of ebooks.
+            Enjoy seamless navigation and offline reading capabilities.
+          </p>
+        </div>
+      </div>
+      <!-- Dark/Light Mode Section -->
+      <div class="card card-compact bg-white shadow-md rounded-lg p-6">
+        <figure>
+          <i class="fa-solid fa-moon fa-3x text-primary mx-auto"></i>
+        </figure>
+        <div class="card-body text-center">
+          <h2 class="card-title text-lg font-semibold">Dark/Light Mode</h2>
+          <p class="text-sm text-gray-600 mb-4">
+            Toggle between dark and light mode for a personalized experience.
+          </p>
+          <button id="toggle-mode" class="btn btn-primary w-full">
+            Switch to Dark Mode
+          </button>
+        </div>
+      </div>
+      <!-- Account Info Section -->
+      <div id="account-card" class="card card-compact bg-white shadow-md rounded-lg p-6 col-span-1 sm:col-span-2">
+        <figure>
+          <i class="fa-solid fa-user fa-3x text-primary mx-auto"></i>
+        </figure>
+        <div class="card-body text-center">
+          <h2 class="card-title text-lg font-semibold">Account Information</h2>
+          <div id="account-details">
+            <p class="text-sm text-gray-600">Loading account details...</p>
+          </div>
+          <div id="login-prompt" class="hidden">
+            <p class="text-sm text-gray-600">
+              You are not logged in. Please
+              <a href="login.html" class="text-primary hover:underline">login</a>
+              to view your account information.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <!-- Footer -->
+  <div id="footer-placeholder" class="w-full mt-auto"></div>
+  <!-- Supabase JS Library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script>
+    // Load navbar dynamically
+    fetch('navbar.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('navbar-placeholder').innerHTML = data;
+      });
+    // Load footer dynamically
+    fetch('footer.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('footer-placeholder').innerHTML = data;
+      });
+
+    // Dark/Light Mode Toggle
+    const toggleModeButton = document.getElementById('toggle-mode');
+    const body = document.getElementById('body');
+    let isDarkMode = localStorage.getItem('darkMode') === 'true';
+    if (isDarkMode) {
+      enableDarkMode();
+    } else {
+      disableDarkMode();
+    }
+    toggleModeButton.addEventListener('click', () => {
+      isDarkMode = !isDarkMode;
+      if (isDarkMode) {
+        enableDarkMode();
+      } else {
+        disableDarkMode();
+      }
+      localStorage.setItem('darkMode', isDarkMode);
+    });
+    function enableDarkMode() {
+      body.classList.add('dark');
+      toggleModeButton.textContent = 'Switch to Light Mode';
+    }
+    function disableDarkMode() {
+      body.classList.remove('dark');
+      toggleModeButton.textContent = 'Switch to Dark Mode';
+    }
+
+    // Supabase Initialization
+    const SUPABASE_URL = "https://eyzvqdknrkkjznqvmxgb.supabase.co";
+    const SUPABASE_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5enZxZGtucmtranpucXZteGdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg0OTc1NzksImV4cCI6MjA1NDA3MzU3OX0.v-3bKrF431br9SKSXPzUOHU-f4CW_4SAgtSic502sbs";
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const { createClient } = window.supabase;
+      if (!createClient) {
+        console.error("Supabase library failed to load.");
+        return;
+      }
+
+      const supabaseClient = createClient(SUPABASE_URL, SUPABASE_API_KEY);
+
+      // DOM Elements
+      const accountDetails = document.getElementById('account-details');
+      const loginPrompt = document.getElementById('login-prompt');
+
+      // Check User Session
+      async function checkSession() {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+
+        if (session) {
+          // User is logged in
+          loginPrompt.classList.add('hidden');
+          accountDetails.innerHTML = ''; // Clear loading message
+
+          // Fetch user details
+          const { data: userData } = await supabaseClient.auth.getUser();
+          const user = userData.user;
+
+          const userName = user.user_metadata.name || 'Unknown';
+          const userEmail = user.email;
+          const userRole = user.user_metadata.role || 'user';
+
+          accountDetails.innerHTML = `
+            <p><strong>Name:</strong> ${userName}</p>
+            <p><strong>Email:</strong> ${userEmail}</p>
+            <p><strong>Role:</strong> ${userRole}</p>
+          `;
+        } else {
+          // User is not logged in
+          loginPrompt.classList.remove('hidden');
+          accountDetails.innerHTML = ''; // Clear account details
+        }
+      }
+
+      // Initialize Account Card
+      checkSession();
+
+      // Listen for Auth State Changes
+      supabaseClient.auth.onAuthStateChange((event, session) => {
+        if (event === 'SIGNED_IN') {
+          checkSession();
+        } else if (event === 'SIGNED_OUT') {
+          checkSession();
+        }
+      });
+    });
+  </script>
+</body>
+</html>

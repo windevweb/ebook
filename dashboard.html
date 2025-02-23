@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Ebook Collection</title>
+  <!-- Google Fonts (Poppins) -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- DaisyUI CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@3.5.1/dist/full.css" rel="stylesheet" type="text/css" />
+  <!-- Font Awesome CDN -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <!-- SweetAlert2 CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="min-h-screen bg-gray-100 text-black font-sans" style="font-family: 'Poppins', sans-serif;">
+
+  <!-- Navbar Placeholder -->
+  <div id="navbar-placeholder">
+    <p class="text-center text-red-500">Navbar failed to load. Please check the file path.</p>
+  </div>
+
+  <!-- Sidebar and Main Content -->
+  <div class="flex flex-1 overflow-hidden">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white shadow-md sticky top-0 h-screen overflow-y-auto">
+      <div class="p-6">
+        <h2 class="text-xl font-bold text-center text-primary mb-6">Admin Panel</h2>
+        <ul class="space-y-4">
+          <li>
+            <a href="dashboard.html" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition duration-300 active">
+              <i class="fa-solid fa-tachometer-alt fa-lg mr-3 text-primary"></i>
+              Dashboard
+            </a>
+          </li>
+          <li>
+            <a href="manage-books.html" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition duration-300">
+              <i class="fa-solid fa-book fa-lg mr-3 text-primary"></i>
+              Manage Books
+            </a>
+          </li>
+          <li>
+            <a href="#" class="flex items-center px-4 py-2 text-red-600 hover:bg-red-100 rounded-lg transition duration-300">
+              <i class="fa-solid fa-sign-out-alt fa-lg mr-3 text-red-600"></i>
+              Logout
+            </a>
+          </li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6 overflow-y-auto">
+      <h1 class="text-3xl font-bold text-gray-800 mb-6">Dashboard</h1>
+
+      <!-- Table of Books -->
+      <div class="overflow-x-auto">
+        <table class="table table-zebra w-full">
+          <thead>
+            <tr>
+              <th class="bg-gray-100 text-gray-700">Title</th>
+              <th class="bg-gray-100 text-gray-700">Author</th>
+              <th class="bg-gray-100 text-gray-700">Cover URL</th>
+              <th class="bg-gray-100 text-gray-700">Read URL</th>
+              <th class="bg-gray-100 text-gray-700">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="books-table-body">
+            <!-- Rows will be dynamically populated here -->
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <div id="footer-placeholder">
+    <p class="text-center text-red-500">Footer failed to load. Please check the file path.</p>
+  </div>
+
+  <!-- Supabase JS Library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+  <script>
+    // Load navbar dynamically
+    fetch('navbar.html')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.text();
+      })
+      .then(data => {
+        document.getElementById('navbar-placeholder').innerHTML = data;
+      })
+      .catch(error => {
+        console.error("Error loading navbar:", error);
+        document.getElementById('navbar-placeholder').innerHTML =
+          `<p class="text-center text-red-500">Navbar failed to load. Please check the file path.</p>`;
+      });
+
+    // Load footer dynamically
+    fetch('footer.html')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.text();
+      })
+      .then(data => {
+        document.getElementById('footer-placeholder').innerHTML = data;
+      })
+      .catch(error => {
+        console.error("Error loading footer:", error);
+        document.getElementById('footer-placeholder').innerHTML =
+          `<p class="text-center text-red-500">Footer failed to load. Please check the file path.</p>`;
+      });
+
+    // Initialize Supabase Client After Script Loads
+    const SUPABASE_URL = "https://eyzvqdknrkkjznqvmxgb.supabase.co";
+    const SUPABASE_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5enZxZGtucmtranpucXZteGdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg0OTc1NzksImV4cCI6MjA1NDA3MzU3OX0.v-3bKrF431br9SKSXPzUOHU-f4CW_4SAgtSic502sbs";
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const { createClient } = window.supabase;
+      if (!createClient) {
+        console.error("Supabase library failed to load.");
+        return;
+      }
+
+      const supabaseClient = createClient(SUPABASE_URL, SUPABASE_API_KEY);
+
+      // DOM Elements
+      const booksTableBody = document.getElementById('books-table-body');
+
+      // Fetch and Render Books
+      async function fetchBooks() {
+        const { data, error } = await supabaseClient
+          .from('ebooks')
+          .select('*');
+
+        if (error) {
+          console.error("Error fetching books:", error);
+          return;
+        }
+
+        booksTableBody.innerHTML = ''; // Clear existing rows
+        data.forEach(book => {
+          const row = `
+            <tr>
+              <td>${book.title}</td>
+              <td>${book.author}</td>
+              <td><a href="${book.cover_url}" target="_blank">View Cover</a></td>
+              <td><a href="${book.read_url}" target="_blank">Read Now</a></td>
+              <td>
+                <button class="btn btn-sm btn-warning mr-2 edit-btn" data-id="${book.id}">
+                  <i class="fa-solid fa-edit"></i>
+                </button>
+                <button class="btn btn-sm btn-error delete-btn" data-id="${book.id}">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          `;
+          booksTableBody.insertAdjacentHTML('beforeend', row); // Append new rows
+        });
+      }
+
+      // Edit or Delete Book
+      booksTableBody.addEventListener('click', async (e) => {
+        if (e.target.closest('.edit-btn')) {
+          const id = e.target.closest('.edit-btn').dataset.id;
+          window.location.href = `manage-books.html?id=${id}`;
+        } else if (e.target.closest('.delete-btn')) {
+          const id = e.target.closest('.delete-btn').dataset.id;
+
+          // Confirm deletion with SweetAlert2
+          Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+          }).then(async (result) => {
+            if (result.isConfirmed) {
+              const { error } = await supabaseClient
+                .from('ebooks')
+                .delete()
+                .eq('id', id);
+
+              if (error) {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Oops...',
+                  text: 'Failed to delete the book!',
+                });
+                console.error("Error deleting book:", error);
+              } else {
+                Swal.fire(
+                  'Deleted!',
+                  'The book has been deleted.',
+                  'success'
+                );
+                fetchBooks(); // Refresh the table after deletion
+              }
+            }
+          });
+        }
+      });
+
+      // Initial Fetch
+      fetchBooks();
+    });
+  </script>
+</body>
+</html>

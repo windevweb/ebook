@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Ebook Collection</title>
+  <!-- Google Fonts (Poppins) -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- DaisyUI CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@3.5.1/dist/full.css" rel="stylesheet" type="text/css" />
+  <!-- Font Awesome CDN -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+</head>
+<body class="min-h-screen bg-gray-100 text-black font-sans" style="font-family: 'Poppins', sans-serif;">
+
+  <!-- Navbar Placeholder -->
+  <div id="navbar-placeholder">
+    <p class="text-center text-red-500">Navbar failed to load. Please check the file path.</p>
+  </div>
+
+  <!-- Sidebar and Main Content -->
+  <div class="flex flex-1 overflow-hidden">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white shadow-md sticky top-0 h-screen overflow-y-auto">
+      <div class="p-6">
+        <h2 class="text-xl font-bold text-center text-primary mb-6">Admin Panel</h2>
+        <ul class="space-y-4">
+          <li>
+            <a href="#" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition duration-300">
+              <i class="fa-solid fa-tachometer-alt fa-lg mr-3 text-primary"></i>
+              Dashboard
+            </a>
+          </li>
+          <li>
+            <a href="#" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition duration-300 active">
+              <i class="fa-solid fa-book fa-lg mr-3 text-primary"></i>
+              Manage Books
+            </a>
+          </li>
+          <li>
+            <a href="#" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition duration-300">
+              <i class="fa-solid fa-users fa-lg mr-3 text-primary"></i>
+              Manage Users
+            </a>
+          </li>
+          <li>
+            <a href="#" class="flex items-center px-4 py-2 text-red-600 hover:bg-red-100 rounded-lg transition duration-300">
+              <i class="fa-solid fa-sign-out-alt fa-lg mr-3 text-red-600"></i>
+              Logout
+            </a>
+          </li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6 overflow-y-auto">
+      <h1 class="text-3xl font-bold text-gray-800 mb-6">Manage Books</h1>
+
+      <!-- Add New Book Button -->
+      <button id="add-book-btn" class="btn btn-primary mb-6">
+        <i class="fa-solid fa-plus mr-2"></i>
+        Add New Book
+      </button>
+
+      <!-- Table of Books -->
+      <div class="overflow-x-auto">
+        <table class="table table-zebra w-full">
+          <thead>
+            <tr>
+              <th class="bg-gray-100 text-gray-700">Title</th>
+              <th class="bg-gray-100 text-gray-700">Author</th>
+              <th class="bg-gray-100 text-gray-700">Cover URL</th>
+              <th class="bg-gray-100 text-gray-700">Read URL</th>
+              <th class="bg-gray-100 text-gray-700">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="books-table-body">
+            <!-- Rows will be dynamically populated here -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Add/Edit Book Modal -->
+      <div id="book-modal" class="modal modal-bottom sm:modal-middle hidden">
+        <div class="modal-box">
+          <h3 class="font-bold text-lg flex items-center" id="modal-title">
+            <i class="fa-solid fa-book fa-lg mr-2 text-primary"></i>
+            Add New Book
+          </h3>
+          <form id="book-form" class="mt-4 space-y-4">
+            <input type="hidden" id="book-id">
+            <div>
+              <label class="label">
+                <span class="label-text flex items-center">
+                  <i class="fa-solid fa-heading fa-lg mr-2 text-primary"></i>
+                  Title
+                </span>
+              </label>
+              <input type="text" id="book-title" placeholder="Enter book title" class="input input-bordered w-full" required>
+            </div>
+            <div>
+              <label class="label">
+                <span class="label-text flex items-center">
+                  <i class="fa-solid fa-user fa-lg mr-2 text-primary"></i>
+                  Author
+                </span>
+              </label>
+              <input type="text" id="book-author" placeholder="Enter author name" class="input input-bordered w-full" required>
+            </div>
+            <div>
+              <label class="label">
+                <span class="label-text flex items-center">
+                  <i class="fa-solid fa-image fa-lg mr-2 text-primary"></i>
+                  Cover URL
+                </span>
+              </label>
+              <input type="url" id="book-cover-url" placeholder="Enter cover image URL" class="input input-bordered w-full" required>
+            </div>
+            <div>
+              <label class="label">
+                <span class="label-text flex items-center">
+                  <i class="fa-solid fa-link fa-lg mr-2 text-primary"></i>
+                  Read URL
+                </span>
+              </label>
+              <input type="url" id="book-read-url" placeholder="Enter read URL" class="input input-bordered w-full" required>
+            </div>
+            <div class="modal-action">
+              <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-save mr-2"></i>
+                Save
+              </button>
+              <button type="button" class="btn btn-ghost" id="close-modal">
+                <i class="fa-solid fa-times mr-2"></i>
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <div id="footer-placeholder">
+    <p class="text-center text-red-500">Footer failed to load. Please check the file path.</p>
+  </div>
+
+  <!-- Supabase JS Library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+  <script>
+    // Load navbar dynamically
+    fetch('navbar.html')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.text();
+      })
+      .then(data => {
+        document.getElementById('navbar-placeholder').innerHTML = data;
+      })
+      .catch(error => {
+        console.error("Error loading navbar:", error);
+        document.getElementById('navbar-placeholder').innerHTML =
+          `<p class="text-center text-red-500">Navbar failed to load. Please check the file path.</p>`;
+      });
+
+    // Load footer dynamically
+    fetch('footer.html')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.text();
+      })
+      .then(data => {
+        document.getElementById('footer-placeholder').innerHTML = data;
+      })
+      .catch(error => {
+        console.error("Error loading footer:", error);
+        document.getElementById('footer-placeholder').innerHTML =
+          `<p class="text-center text-red-500">Footer failed to load. Please check the file path.</p>`;
+      });
+
+    // Initialize Supabase Client After Script Loads
+    const SUPABASE_URL = "https://eyzvqdknrkkjznqvmxgb.supabase.co";
+    const SUPABASE_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5enZxZGtucmtranpucXZteGdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg0OTc1NzksImV4cCI6MjA1NDA3MzU3OX0.v-3bKrF431br9SKSXPzUOHU-f4CW_4SAgtSic502sbs";
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const { createClient } = window.supabase;
+      if (!createClient) {
+        console.error("Supabase library failed to load.");
+        return;
+      }
+
+      const supabaseClient = createClient(SUPABASE_URL, SUPABASE_API_KEY);
+
+      // DOM Elements
+      const booksTableBody = document.getElementById('books-table-body');
+      const addBookBtn = document.getElementById('add-book-btn');
+      const bookModal = document.getElementById('book-modal');
+      const closeModalBtn = document.getElementById('close-modal');
+      const bookForm = document.getElementById('book-form');
+      const bookIdInput = document.getElementById('book-id');
+      const bookTitleInput = document.getElementById('book-title');
+      const bookAuthorInput = document.getElementById('book-author');
+      const bookCoverUrlInput = document.getElementById('book-cover-url');
+      const bookReadUrlInput = document.getElementById('book-read-url');
+
+      // Fetch and Render Books
+      async function fetchBooks() {
+        const { data, error } = await supabaseClient
+          .from('ebooks')
+          .select('*');
+
+        if (error) {
+          console.error("Error fetching books:", error);
+          return;
+        }
+
+        booksTableBody.innerHTML = ''; // Clear existing rows
+        data.forEach(book => {
+          const row = `
+            <tr>
+              <td>${book.title}</td>
+              <td>${book.author}</td>
+              <td><a href="${book.cover_url}" target="_blank">View Cover</a></td>
+              <td><a href="${book.read_url}" target="_blank">Read Now</a></td>
+              <td>
+                <button class="btn btn-sm btn-warning mr-2 edit-btn" data-id="${book.id}">
+                  <i class="fa-solid fa-edit"></i>
+                </button>
+                <button class="btn btn-sm btn-error delete-btn" data-id="${book.id}">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          `;
+          booksTableBody.insertAdjacentHTML('beforeend', row); // Append new rows
+        });
+      }
+
+      // Open Modal for Adding New Book
+      addBookBtn.addEventListener('click', () => {
+        document.getElementById('modal-title').innerHTML = `
+          <i class="fa-solid fa-book fa-lg mr-2 text-primary"></i>
+          Add New Book
+        `;
+        bookIdInput.value = '';
+        bookTitleInput.value = '';
+        bookAuthorInput.value = '';
+        bookCoverUrlInput.value = '';
+        bookReadUrlInput.value = '';
+        bookModal.classList.remove('hidden'); // Show the modal
+      });
+
+      // Close Modal
+      closeModalBtn.addEventListener('click', () => {
+        bookModal.classList.add('hidden'); // Hide the modal
+      });
+
+      // Save Book (Create or Update)
+      bookForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = bookIdInput.value;
+        const title = bookTitleInput.value;
+        const author = bookAuthorInput.value;
+        const coverUrl = bookCoverUrlInput.value;
+        const readUrl = bookReadUrlInput.value;
+
+        if (id) {
+          // Update existing book
+          const { error } = await supabaseClient
+            .from('ebooks')
+            .update({ title, author, cover_url: coverUrl, read_url: readUrl })
+            .eq('id', id);
+
+          if (error) {
+            console.error("Error updating book:", error);
+          }
+        } else {
+          // Insert new book
+          const { error } = await supabaseClient
+            .from('ebooks')
+            .insert([{ title, author, cover_url: coverUrl, read_url: readUrl }]);
+
+          if (error) {
+            console.error("Error inserting book:", error);
+          }
+        }
+
+        fetchBooks(); // Refresh the table after saving
+        bookModal.classList.add('hidden'); // Hide the modal after saving
+      });
+
+      // Edit or Delete Book
+      booksTableBody.addEventListener('click', async (e) => {
+        if (e.target.closest('.edit-btn')) {
+          const id = e.target.closest('.edit-btn').dataset.id;
+          const { data, error } = await supabaseClient
+            .from('ebooks')
+            .select('*')
+            .eq('id', id)
+            .single();
+
+          if (error) {
+            console.error("Error fetching book:", error);
+            return;
+          }
+
+          document.getElementById('modal-title').innerHTML = `
+            <i class="fa-solid fa-edit fa-lg mr-2 text-primary"></i>
+            Edit Book
+          `;
+          bookIdInput.value = data.id;
+          bookTitleInput.value = data.title;
+          bookAuthorInput.value = data.author;
+          bookCoverUrlInput.value = data.cover_url;
+          bookReadUrlInput.value = data.read_url;
+          bookModal.classList.remove('hidden'); // Show the modal
+        } else if (e.target.closest('.delete-btn')) {
+          const id = e.target.closest('.delete-btn').dataset.id;
+          const { error } = await supabaseClient
+            .from('ebooks')
+            .delete()
+            .eq('id', id);
+
+          if (error) {
+            console.error("Error deleting book:", error);
+          }
+
+          fetchBooks(); // Refresh the table after deletion
+        }
+      });
+
+      // Initial Fetch
+      fetchBooks();
+    });
+  </script>
+</body>
+</html>

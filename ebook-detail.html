@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ebook Detail</title>
+  <!-- Google Fonts (Poppins) -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- DaisyUI CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@3.5.1/dist/full.css" rel="stylesheet" type="text/css" />
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center text-black font-sans" style="font-family: 'Poppins', sans-serif;">
+  <!-- Header Section -->
+  <header class="w-full px-6 py-8 text-center">
+    <h1 class="text-3xl font-bold mb-4">Ebook Detail</h1>
+  </header>
+
+  <!-- Back Button -->
+  <div class="absolute top-4 left-4">
+    <a href="ebooks.html" class="btn btn-primary btn-sm flex items-center gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+      </svg>
+      Back to Home
+    </a>
+  </div>
+
+  <!-- Ebook Detail -->
+  <main id="ebookDetail" class="w-full max-w-4xl mx-auto px-6 mt-8">
+    <!-- Content will be dynamically loaded here -->
+  </main>
+
+  <!-- Footer Placeholder -->
+  <div id="footer-placeholder" class="w-full mt-auto"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script>
+    // Initialize Supabase client
+    const SUPABASE_URL = 'https://eyzvqdknrkkjznqvmxgb.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5enZxZGtucmtranpucXZteGdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg0OTc1NzksImV4cCI6MjA1NDA3MzU3OX0.v-3bKrF431br9SKSXPzUOHU-f4CW_4SAgtSic502sbs';
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // Get ebook ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const ebookId = urlParams.get('id');
+
+    // Fetch and display ebook details
+    async function fetchEbookDetail(id) {
+      const { data, error } = await supabaseClient
+        .from('ebooks')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) {
+        console.error('Error fetching ebook detail:', error);
+        return;
+      }
+
+      const ebookDetail = document.getElementById('ebookDetail');
+      ebookDetail.innerHTML = `
+        <div class="card lg:card-side bg-white shadow-xl rounded-lg p-6">
+          <figure class="lg:w-1/3">
+            <img src="${data.cover_url || ''}" alt="${data.title}" class="rounded-md w-full h-64 object-cover ${!data.cover_url ? 'dynamic-cover' : ''}">
+            ${!data.cover_url ? `<span class="text-white text-2xl font-bold">${data.title.charAt(0)}</span>` : ''}
+          </figure>
+          <div class="card-body lg:w-2/3">
+            <h2 class="card-title text-2xl sm:text-3xl font-bold">${data.title}</h2>
+            <p class="text-gray-600"><strong>Author:</strong> ${data.author}</p>
+            <p class="text-gray-600"><strong>Description:</strong> Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            <div class="card-actions mt-4">
+              <a href="${data.read_url}" target="_blank" class="btn btn-primary">Read Now</a>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Load footer dynamically
+    fetch('footer.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('footer-placeholder').innerHTML = data;
+      });
+
+    // Fetch ebook detail on page load
+    fetchEbookDetail(ebookId);
+  </script>
+</body>
+</html>
